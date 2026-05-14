@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ксения Чудинова — AI-разработчик</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: rgba(255,255,255,0.07);
+      --accent1: #a259ff;
+      --accent2: #00d4ff;
+      --accent3: #ff6b9d;
+      --text: #e8e8e8;
+      --muted: #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent1), transparent 70%);
+      top: -150px; left: -150px;
+      animation: drift1 12s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent2), transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: drift2 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(60px, 40px); } }
+    @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-50px, -30px); } }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 52px 44px 44px;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      box-shadow:
+        0 0 0 1px rgba(162,89,255,0.08),
+        0 32px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      animation: cardIn 0.7s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Top glow line */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Avatar */
+    .avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 28px;
+    }
+    .avatar {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a0a2e 0%, #0d1f3c 50%, #1a0a2e 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 40px rgba(162,89,255,0.4);
+      animation: avatarPulse 4s ease-in-out infinite;
+      overflow: hidden;
+    }
+    @keyframes avatarPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(162,89,255,0.35), 0 0 60px rgba(0,212,255,0.1); }
+      50%       { box-shadow: 0 0 50px rgba(162,89,255,0.55), 0 0 90px rgba(0,212,255,0.2); }
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: linear-gradient(var(--surface), var(--surface)) padding-box,
+                  linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3)) border-box;
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Name */
+    .name {
+      font-size: clamp(26px, 6vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--accent1) 45%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(162,89,255,0.4));
+      animation: nameGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes nameGlow {
+      from { filter: drop-shadow(0 0 12px rgba(162,89,255,0.35)); }
+      to   { filter: drop-shadow(0 0 28px rgba(0,212,255,0.5)); }
+    }
+
+    /* Role badge */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(162,89,255,0.12);
+      border: 1px solid rgba(162,89,255,0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #c8a0ff;
+      margin-bottom: 28px;
+    }
+    .role-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent1);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), rgba(162,89,255,0.2), var(--border), transparent);
+      margin: 4px 0 28px;
+    }
+
+    /* Description */
+    .desc {
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: #aaa;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .desc p { margin-bottom: 10px; }
+    .desc p:last-child { margin-bottom: 0; }
+    .highlight {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Tags */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+    .tag {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      transition: all 0.25s;
+      cursor: default;
+    }
+    .tag:hover {
+      background: rgba(162,89,255,0.1);
+      border-color: rgba(162,89,255,0.3);
+      color: #c8a0ff;
+      transform: translateY(-2px);
+    }
+
+    /* Social icons row */
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .social-btn {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--muted);
+      transition: all 0.3s cubic-bezier(.22,1,.36,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .social-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .social-btn.tg::before  { background: linear-gradient(135deg, #2AABEE22, #229ED922); }
+
+    .social-btn:hover {
+      transform: translateY(-5px) scale(1.08);
+      border-color: transparent;
+      color: #fff;
+    }
+    .social-btn.tg:hover  {
+      box-shadow: 0 8px 24px rgba(42,171,238,0.35);
+      border-color: rgba(42,171,238,0.4);
+    }
+    .social-btn:hover::before { opacity: 1; }
+
+    .social-btn svg { width: 22px; height: 22px; position: relative; z-index: 1; transition: transform 0.3s; }
+    .social-btn:hover svg { transform: scale(1.1); }
+
+    /* CTA button */
+    .cta-wrap { position: relative; display: inline-block; width: 100%; }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 28px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--accent1) 0%, #6e3ddf 50%, var(--accent2) 100%);
+      background-size: 200% 200%;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(.22,1,.36,1);
+      animation: gradShift 5s ease infinite;
+    }
+    @keyframes gradShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .cta::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 14px;
+    }
+
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(162,89,255,0.45), 0 4px 16px rgba(0,212,255,0.2);
+    }
+    .cta:hover::after { opacity: 1; }
+    .cta:active { transform: translateY(-1px); }
+
+    .cta svg { width: 18px; height: 18px; transition: transform 0.3s; }
+    .cta:hover svg { transform: translateX(3px); }
+
+    /* Ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 0.5px;
+    }
+
+    /* Particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: var(--accent1);
+      border-radius: 50%;
+      opacity: 0;
+      animation: floatUp var(--dur) ease-in var(--delay) infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.2; }
+      100% { transform: translateY(-10vh) translateX(var(--dx)); opacity: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 36px 24px 32px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="card">
+
+    <!-- Avatar -->
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar">
+        <!-- Vibe coder duck SVG -->
+        <svg width="82" height="82" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Stars bg -->
+          <circle cx="12" cy="14" r="1.2" fill="#a259ff" opacity="0.7"/>
+          <circle cx="88" cy="20" r="1" fill="#00d4ff" opacity="0.6"/>
+          <circle cx="22" cy="82" r="0.9" fill="#ff6b9d" opacity="0.5"/>
+          <circle cx="82" cy="78" r="1.1" fill="#a259ff" opacity="0.5"/>
+
+          <!-- TAIL -->
+          <ellipse cx="18" cy="62" rx="11" ry="7" fill="#e8c400" transform="rotate(-25 18 62)"/>
+
+          <!-- BODY -->
+          <ellipse cx="50" cy="68" rx="30" ry="21" fill="#FFE033"/>
+
+          <!-- WING -->
+          <ellipse cx="46" cy="68" rx="17" ry="9" fill="#e8c400" opacity="0.75"/>
+
+          <!-- BELLY -->
+          <ellipse cx="56" cy="73" rx="16" ry="11" fill="#FFFDE8" opacity="0.55"/>
+
+          <!-- CODE badge on belly -->
+          <text x="45" y="76" font-size="10" fill="#8B2FFF" font-family="monospace" font-weight="900" opacity="0.9">&lt;/&gt;</text>
+
+          <!-- HEAD -->
+          <circle cx="63" cy="37" r="20" fill="#FFE033"/>
+
+          <!-- CHEEK BLUSH -->
+          <ellipse cx="70" cy="46" rx="5.5" ry="3.5" fill="#FFB3C6" opacity="0.55"/>
+
+          <!-- BEAK -->
+          <path d="M 80 33 L 94 38 L 80 43 Z" fill="#FF8C00"/>
+          <path d="M 80 37 L 91 38 L 80 40 Z" fill="#cc6a00" opacity="0.5"/>
+
+          <!-- EYE WHITE -->
+          <circle cx="69" cy="31" r="7" fill="white"/>
+          <!-- PUPIL -->
+          <circle cx="70" cy="31" r="4" fill="#1a0a2e"/>
+          <!-- SHINE -->
+          <circle cx="72" cy="29" r="1.8" fill="white"/>
+
+          <!-- SUNGLASSES frame -->
+          <rect x="60" y="25" width="19" height="13" rx="6" fill="#7B2FFF" opacity="0.92"/>
+          <!-- lens shine -->
+          <path d="M 62 28 Q 67.5 26.5 72 28" stroke="rgba(255,255,255,0.45)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- frame border -->
+          <rect x="60" y="25" width="19" height="13" rx="6" fill="none" stroke="#5a10cc" stroke-width="1.2"/>
+          <!-- side strap -->
+          <line x1="79" y1="30" x2="84" y2="27" stroke="#5a10cc" stroke-width="1.5" stroke-linecap="round"/>
+
+          <!-- FEET -->
+          <g fill="#FF8C00">
+            <path d="M 36 88 L 28 95 L 33 95 L 36 88"/>
+            <path d="M 36 88 L 38 95 L 43 95 L 36 88"/>
+            <path d="M 50 88 L 43 95 L 48 95 L 50 88"/>
+            <path d="M 50 88 L 52 95 L 57 95 L 50 88"/>
+          </g>
+
+          <!-- Sparkles -->
+          <g fill="#00d4ff" opacity="0.7">
+            <path d="M 8 35 L 9.5 38 L 8 41 L 6.5 38 Z"/>
+          </g>
+          <g fill="#ff6b9d" opacity="0.6">
+            <path d="M 90 52 L 91 54.5 L 90 57 L 89 54.5 Z"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Name -->
+    <div class="name">Ксения Чудинова</div>
+
+    <!-- Role badge -->
+    <div class="role-badge">
+      <span class="role-dot"></span>
+      Промпт-инженер &amp; AI-разработчик
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Description -->
+    <div class="desc">
+      <p>
+        <span class="highlight">📊 Специализируюсь</span> на создании ИИ-инструментов для автоматизации бизнеса, продаж и обработки технической документации.
+      </p>
+      <p>
+        <span class="highlight">✨ Помогаю бизнесу</span> внедрять ИИ-решения: от умных чат-ботов, создание и оптимизация лендингов до систем анализа сложной документации.
+      </p>
+    </div>
+
+    <!-- Tags -->
+    <div class="tags">
+      <span class="tag">🤖 Чат-боты</span>
+      <span class="tag">⚙️ Автоматизация</span>
+      <span class="tag">📄 Документация</span>
+      <span class="tag">🚀 Лендинги</span>
+      <span class="tag">💡 Промпт-инжиниринг</span>
+      <span class="tag">🧠 LLM</span>
+    </div>
+
+    <!-- Socials -->
+    <div class="socials">
+      <a class="social-btn tg" href="https://t.me/gtrb_Ksenia" target="_blank" rel="noopener" title="Telegram">
+        <!-- Telegram SVG -->
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.93 6.708l-1.683 7.927c-.126.563-.457.7-.924.435l-2.56-1.886-1.233 1.188c-.137.137-.252.252-.516.252l.184-2.608 4.753-4.294c.207-.184-.045-.285-.32-.101L7.27 14.395l-2.516-.786c-.547-.171-.558-.547.114-.81l9.815-3.785c.455-.165.854.101.247.694z" fill="#2AABEE"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- CTA -->
+    <a class="cta" href="https://t.me/gtrb_Ksenia" target="_blank" rel="noopener" id="cta-btn">
+      <!-- Send icon -->
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Написать мне
+    </a>
+
+    <div class="footer">kseniya.chudinova · AI &amp; Prompt Engineering</div>
+  </div>
+
+  <script>
+    // Particles
+    const container = document.getElementById('particles');
+    const colors = ['#a259ff', '#00d4ff', '#ff6b9d', '#ffffff'];
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.cssText = [
+        `left:${Math.random()*100}%`,
+        `--dur:${6 + Math.random()*10}s`,
+        `--delay:${Math.random()*12}s`,
+        `--dx:${(Math.random()-0.5)*120}px`,
+        `background:${colors[Math.floor(Math.random()*colors.length)]}`,
+        `width:${1+Math.random()*2.5}px`,
+        `height:${1+Math.random()*2.5}px`,
+      ].join(';');
+      container.appendChild(p);
+    }
+
+    // Ripple on CTA
+    document.getElementById('cta-btn').addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      this.appendChild(r);
+      setTimeout(() => r.remove(), 700);
+    });
+  </script>
+</body>
+</html>
